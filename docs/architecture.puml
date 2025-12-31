@@ -1,0 +1,29 @@
+@startuml
+' PlantUML component diagram for Containerized Flask App
+skinparam componentStyle rectangle
+
+actor Host as Host
+folder "GitHub Actions CI" as CI
+component "Docker Compose\n`docker-compose.yml`" as Compose
+component "Docker Build (Dockerfile)\nbase: python:3.11-slim" as Build
+component "Image: containerized-flask-app" as Image
+component "Container: flask_app\nuser: appuser\nlistens: 5000" as Container
+database "App code\n`app/main.py`" as AppCode
+note right of Host
+  docker compose up --build
+  maps host port 8090 -> container 5000 (compose)
+  CI workflow maps 8080 -> 5000
+end note
+
+Host --> Compose : start
+Compose --> Build : build .
+Build --> Image
+Image --> Container : run
+Container --> AppCode : executes
+CI --> Image : build & push
+CI --> Host : runs container for verification (8080:5000)
+
+note bottom
+  NOTE: README mentions 8080 but compose uses 8090.\nConfirm which host port is intended.
+end note
+@enduml

@@ -1,0 +1,28 @@
+// Graphviz diagram for Containerized Flask App
+// Note: docker-compose.yml maps host port 8090 -> container 5000.
+
+digraph architecture {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor="#f7f7f7", fontname="Helvetica"];
+
+  Host [label="Host (developer / CI)"];
+  DockerCompose [label="Docker Compose\n`docker-compose.yml`"];
+  Build [label="Docker Build\n`Dockerfile` -> python:3.11-slim"];
+  Image [label="Image: containerized-flask-app"];
+  Container [label="Container: `flask_app`\nUser: appuser\nApp listens: 5000\nCMD: python main.py"];
+  AppCode [label="App code\n`app/main.py`\nEndpoints: /, /health"];
+  Volumes [label="(no volumes defined)", shape=note];
+  CI [label="GitHub Actions CI\n(build & push & run)", shape=folder];
+
+  Host -> DockerCompose [label="docker compose up --build", fontsize=10];
+  DockerCompose -> Build [label="build: .", fontsize=10];
+  Build -> Image;
+  Image -> Container [label="run container"];
+  Container -> AppCode [label="runs"];
+  Container -> Host [label="ports 8090:5000 (compose)", fontsize=10];
+  CI -> Image [label="build & push; CI run maps 8080:5000 in workflow", fontsize=10];
+
+  // Visual note about mismatch
+  mismatch [label="NOTE: README references host port 8080;\n`docker-compose.yml` maps 8090:5000;\nCI uses 8080:5000.\nVerify desired host port.", shape=note, fillcolor="#fff0d0"];
+  Host -> mismatch [style=dashed];
+}
