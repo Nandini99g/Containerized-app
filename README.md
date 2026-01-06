@@ -21,14 +21,23 @@ This project demonstrates a containerized Python Flask application using Docker,
 - Docker Compose maps host port **8080** to container port **5000**.
 
 ### Traffic Flow
+
 User Browser
+
 ↓
+
 localhost:8080
+
 ↓
+
 Docker Compose
+
 ↓
+
 Container:5000
+
 ↓
+
 Flask Application
 
 
@@ -112,4 +121,5 @@ http://localhost:8080/health
 ```bash
 docker compose up --build
 curl http://localhost:8080/
+
 curl http://localhost:8080/health
